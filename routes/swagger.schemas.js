@@ -11,7 +11,7 @@
  *         nom:
  *           type: string
  *           example: "Burgers"
- * -----------------------------------------------
+
  *     Produit:
  *       type: object
  *       properties:
@@ -32,7 +32,7 @@
  *           example: 1
  *         categorie:
  *           $ref: '#/components/schemas/Categorie'
- * -----------------------------------------------
+
  *     Client:
  *       type: object
  *       properties:
@@ -42,7 +42,7 @@
  *         nom:
  *           type: string
  *           example: "Dupont"
- * -----------------------------------------------
+
  *     Utilisateur:
  *       type: object
  *       properties:
@@ -55,7 +55,7 @@
  *         role:
  *           type: string
  *           example: "ADMINISTRATION"
- * -----------------------------------------------
+
  *     LigneCommande:
  *       type: object
  *       required:
@@ -83,7 +83,7 @@
  *           example: 12.0
  *         produit_de_la_ligne:
  *           $ref: '#/components/schemas/Produit'
- * -----------------------------------------------
+
  *     Commande:
  *       type: object
  *       required:
@@ -135,7 +135,7 @@
  *           items:
  *             $ref: '#/components/schemas/LigneCommande'
  * 
- * -----------------------------------------------
+
  * 
  *     Article:
  *       type: object
@@ -157,7 +157,7 @@
  *           example: 2
  *         categorie:
  *           $ref: '#/components/schemas/Categorie'
- * -----------------------------------------------
+
  *     Option:
  *       type: object
  *       properties:
@@ -170,7 +170,8 @@
  *         prix_supplementaire:
  *           type: number
  *           example: 1.5
- * -----------------------------------------------
+
+
  *     Menu:
  *       type: object
  *       description: "Un menu est un article composé de plusieurs produits et d'options"
