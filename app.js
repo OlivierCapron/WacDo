@@ -5,6 +5,10 @@ const expressRateLimit = require('express-rate-limit');
 const dotenv = require('dotenv');
 const { sequelize, connectDB } = require('./config/database'); 
 const app = express();
+
+
+console.log("server starting...");
+
 app.use(express.json());
 app.use(helmet());
 app.use(cors());
@@ -21,29 +25,24 @@ app.use(expressRateLimit(
   }
 ))
 
-
-
 const setupSwagger = require('./swagger');
 
-
-
-
 dotenv.config();
+
 // Connexion MySQL
 connectDB(); 
 
 
 // Instanciation des tables
-
-// PAs de confilt pour les tests 
+// Pas de confilt pour les tests 
 if (process.env.NODE_ENV !== 'test') {
   sequelize.sync()
     .then(() => console.log("Tables synchronisées !"))
     .catch(err => console.error("Erreur sync:", err));
 }
-// Routes
-require('./models/associations');
 
+// Chargement des associations
+require('./models/associations');
 
 
 app.use('/api/utilisateurs', require('./routes/utilisateurs.routes'));

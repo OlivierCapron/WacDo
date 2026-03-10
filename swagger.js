@@ -12,7 +12,18 @@ const options =
             description: " Documentation de l’API WacDo",
         },
         servers: [
-            { url: 'http://localhost:5000',url: 'http://127.0.0.1:5000', url: 'https://formation.fleyetrap.com'  }
+        {
+            url: "http://localhost:5000",
+            description: "Localhost"
+        },
+        {
+            url: "http://127.0.0.1:5000",
+            description: "Local IP"
+        },
+        {
+            url: "https://nodejs.fleyetrap.com",
+            description: "Production"
+        }
         ],
         components: {
             securitySchemes: {

@@ -175,7 +175,6 @@ exports.loginUtilisateur = async (req, res) => {
             
             );
 
-            console.log('TOKEN:', token);
             res.status(200).json({token, utilisateur : existingUtilisateur});
     }
     catch (err) {
