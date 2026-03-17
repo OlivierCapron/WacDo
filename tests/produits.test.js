@@ -13,8 +13,12 @@ const { logger } = require('sequelize/lib/utils/logger');
 
 jest.mock('../middleware/auth', () => {
   return (req, res, next) => {
-    // On mcok un Admin
-    req.utilisateur = { utilisateurId: 1, identifiant:'test@wacdo.fr', motDePasse:'Password123',role: 'ADMINISTRATION' };
+    req.utilisateur = {
+      utilisateur_id: 1,
+      identifiant: 'test@wacdo.fr',
+      motDePasse: 'Password123',
+      role: 'ADMINISTRATION'
+    };
     next();
   };
 });
@@ -52,7 +56,7 @@ describe('Tests API /api/produits', () => {
         nom: 'Big Mac',
         description: 'Un burger savoureux avec steak et fromage',
         prix: 8.50,
-        categorie: categorieCree.categorie_id,
+        categorie_id: categorieCree.categorie_id,
         disponible: true
      
       });

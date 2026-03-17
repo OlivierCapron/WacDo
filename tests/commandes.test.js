@@ -17,33 +17,37 @@ const Client = require('../models/client.model');
 const Utilisateur = require('../models/utilisateur.model');
 
 
+
 jest.mock('../middleware/auth', () => {
   const jwt = require('jsonwebtoken');
   const dotenv = require('dotenv');
-  dotenv.config();
+  dotenv.config({ path: '.env.test' });
 
   return (req, res, next) => {
     const header = req.header('Authorization');
 
-    // Si y a pas de header, on est dans le cas par defaut
     if (!header) {
-      req.utilisateur = { role: 'ACCUEIL' }; 
+      req.utilisateur = { utilisateur_id: 2, role: 'ACCUEIL' };
       return next();
     }
 
-    // Sinon on recupere le bon utilisateur en fonction du toke  passé
     const token = header.split(' ')[1];
+
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.utilisateur = decoded;
-      next();
+
+      req.utilisateur = {
+        utilisateur_id:  decoded.utilisateurId,
+        identifiant: decoded.identifiant,
+        role: decoded.role
+      };
+
+      return next();
     } catch (err) {
-      console.error("Token invalide :", err.message);
       return res.status(401).json({ message: 'Token invalide' });
     }
   };
 });
-
 
 
 const jwt = require('jsonwebtoken');
@@ -120,6 +124,7 @@ describe('Tests API /api/commandes', () => {
 
     produitCree = await request(app)
       .post('/api/produits')
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({
         nom: 'Burger Test',
         description: 'Burger de test',
@@ -130,6 +135,7 @@ describe('Tests API /api/commandes', () => {
 
     menuCree = await request(app)
       .post('/api/menus')
+      .set('Authorization', `Bearer ${adminToken}`)
       .send({
         nom: 'Menu Test',
         description: 'Menu de test',
@@ -184,7 +190,6 @@ describe('Tests API /api/commandes', () => {
     const res = await request(app)
       .get('/api/commandes')
       .set('Authorization', `Bearer ${accueilToken}`);
-    console.log("AAAA"+res.body)
 
     expect(res.statusCode).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);

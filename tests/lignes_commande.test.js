@@ -22,7 +22,7 @@ const Utilisateur = require('../models/utilisateur.model');
 jest.mock('../middleware/auth', () => {
   return (req, res, next) => {
     // On mcok un Admin
-    req.utilisateur = { utilisateurId: 1, identifiant:'test@wacdo.fr', motDePasse:'Password123',role: 'ADMINISTRATION' };
+    req.utilisateur = {  utilisateur_id: 1, identifiant:'test@wacdo.fr', motDePasse:'Password123',role: 'ADMINISTRATION' };
     next();
   };
 });
@@ -64,11 +64,11 @@ describe('Tests API /api/commandes/:id/lignes', () => {
     nom: 'Burger Test',
     description: 'Burger de test',
     prix: 8.5,
-    categorie: categorieCree.categorie_id,
+    categorie_id: categorieCree.categorie_id,
     disponible: true
   });
 
-    menuCree = await request(app)
+ menuCree = await request(app)
   .post('/api/menus')
   .send({
     nom: 'Menu Test',
@@ -76,13 +76,20 @@ describe('Tests API /api/commandes/:id/lignes', () => {
     prix: 18.5,
     disponible: true
   });
-  commandeCree = await request(app)
+
+expect(menuCree.statusCode).toBe(201);
+expect(menuCree.body).toHaveProperty('menu_id');
+
+commandeCree = await request(app)
   .post('/api/commandes')
   .set('Authorization', `Bearer ${utilisateurToken}`)
   .send({
     client_id: clientCree.client_id,
     origine: 'COMPTOIR'
   });
+
+expect(commandeCree.statusCode).toBe(201);
+expect(commandeCree.body).toHaveProperty('commande_id');
 });
   /**
    * Ajout d'une ligne de commande
