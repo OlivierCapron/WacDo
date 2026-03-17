@@ -26,17 +26,8 @@ const router = express.Router();
 /**
  * @swagger
  * /api/commandes:
- *   get:
- *     summary: Liste complète des commandes
- *     tags: [Commandes]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Liste des commandes récupérée 
- *
  *   post:
- *     summary: Créer une nouvelle commande
+ *     summary: Créer une commande
  *     tags: [Commandes]
  *     security:
  *       - bearerAuth: []
@@ -52,11 +43,18 @@ const router = express.Router();
  *             properties:
  *               client_id:
  *                 type: integer
+ *                 example: 1
  *               origine:
  *                 type: string
+ *                 enum: [COMPTOIR, TELEPHONE]
+ *                 example: COMPTOIR
  *     responses:
  *       201:
  *         description: Commande créée
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Commande'
  */
 router.get('/', auth, getCommandes);
 

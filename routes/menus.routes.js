@@ -174,18 +174,26 @@
      *           schema:
      *             type: object
      *             required:
-     *               - produit_id
+     *               - produitId
+     *               - quantite
      *             properties:
-     *               produit_id:
+     *               produitId:
      *                 type: integer
      *                 example: 3
+     *               quantite:
+     *                 type: integer
+     *                 example: 2
      *     responses:
      *       201:
      *         description: Produit ajouté au menu
      *         content:
      *           application/json:
      *             schema:
-     *               $ref: '#/components/schemas/Menu'
+     *               type: object
+     *               properties:
+     *                 message:
+     *                   type: string
+     *                   example: Produit ajouté au menu avec succès
      *       404:
      *         description: Menu ou produit introuvable
      */
@@ -236,6 +244,7 @@
      *         required: true
      *         schema:
      *           type: integer
+     *         description: ID du menu
      *     requestBody:
      *       required: true
      *       content:
@@ -243,18 +252,26 @@
      *           schema:
      *             type: object
      *             required:
-     *               - option_id
+     *               - optionId
+     *               - quantite
      *             properties:
-     *               option_id:
+     *               optionId:
      *                 type: integer
      *                 example: 2
+     *               quantite:
+     *                 type: integer
+     *                 example: 1
      *     responses:
      *       201:
      *         description: Option ajoutée au menu
      *         content:
      *           application/json:
      *             schema:
-     *               $ref: '#/components/schemas/Menu'
+     *               type: object
+     *               properties:
+     *                 message:
+     *                   type: string
+     *                   example: Option ajoutée au menu avec succès
      *       404:
      *         description: Menu ou option non trouvée
      */
