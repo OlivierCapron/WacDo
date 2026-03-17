@@ -100,9 +100,9 @@ exports.getProduitDetails = async (req, res) => {
  */
 exports.createProduit = async (req, res) => {
   try {
-    const { nom, description, prix , categorie, disponible } = req.body;
+    const { nom, description, prix , categorie_id, disponible } = req.body;
 
-    const categorieExiste = await Categorie.findByPk(categorie);
+    const categorieExiste = await Categorie.findByPk(categorie_id);
     if (!categorieExiste) {
       return res.status(400).json({ error: "Catégorie invalide" });
     }

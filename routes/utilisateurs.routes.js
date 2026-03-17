@@ -41,6 +41,27 @@ const router = express.Router();
  */
 router.get('/',auth,getUtilisateurs);
 
+/**
+ * @swagger
+ * /api/utilisateurs/roles:
+ *   get:
+ *     summary: Récupérer la liste des rôles disponibles
+ *     tags: [Utilisateurs]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Liste des rôles récupérée
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: string
+ *               example: ["ADMINISTRATION", "PREPARATION", "ACCUEIL"]
+ */
+router.get('/roles',auth,authorizeRoles('ADMINISTRATION'),  getRoles);
+
 
 /**
  * @swagger
@@ -103,26 +124,6 @@ router.get('/:id',auth,  getUtilisateurDetails);
 router.post('/',auth,authorizeRoles('ADMINISTRATION'),createUtilisateur);
 
 
-/**
- * @swagger
- * /api/utilisateurs/roles:
- *   get:
- *     summary: Récupérer la liste des rôles disponibles
- *     tags: [Utilisateurs]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Liste des rôles récupérée
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: string
- *               example: ["ADMINISTRATION", "PREPARATION", "ACCUEIL"]
- */
-router.get('/roles',auth,authorizeRoles('ADMINISTRATION'),  getRoles);
 
 
 /**
@@ -196,7 +197,7 @@ router.put('/:id',auth,authorizeRoles('ADMINISTRATION'),  editUtilisateur);
 router.delete('/:id',auth,authorizeRoles('ADMINISTRATION'),  deleteUtilisateur);
 
 
-
+ 
 /**
  * @swagger
  * /api/utilisateurs/auth/login:

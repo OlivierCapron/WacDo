@@ -199,4 +199,23 @@
  *           description: Liste des options disponibles pour le menu
  *           items:
  *             $ref: '#/components/schemas/Option'
+ 
+
+
+ *     MenuInput:
+ *       type: object
+ *       required:
+ *         - nom
+ *         - prix
+ *       properties:
+ *         nom:
+ *           type: string
+ *           example: Menu Maxi Best Of
+ *         prix:
+ *           type: number
+ *           format: float
+ *           example: 12.9
+ *         description:
+ *           type: string
+ *           example: Menu avec burger, frites et boisson
  */

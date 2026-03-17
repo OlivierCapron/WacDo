@@ -81,8 +81,8 @@ router.get('/:id',auth,  getMenuDetails);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Menu'
- *     responses:
+ *             $ref: '#/components/schemas/MenuCreateInput'
+ *      responses:
  *       201:
  *         description: Menu créé avec succès
  *         content:
@@ -115,7 +115,7 @@ router.post('/',auth,authorizeRoles('ADMINISTRATION'),createMenu);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Menu'
+ *             $ref: '#/components/schemas/MenuCreateInput'
  *     responses:
  *       200:
  *         description: Menu mis à jour avec succès
