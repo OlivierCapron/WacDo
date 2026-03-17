@@ -41,7 +41,6 @@ router.get('/', auth, getOptions);
 /**
  * @swagger
  * /api/options:
- *
  *   post:
  *     summary: Créer une nouvelle option
  *     tags: [Options]
@@ -52,7 +51,18 @@ router.get('/', auth, getOptions);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Option'
+ *             type: object
+ *             required:
+ *               - nom
+ *               - prix
+ *             properties:
+ *               nom:
+ *                 type: string
+ *                 example: Boisson
+ *               prix:
+ *                 type: number
+ *                 format: float
+ *                 example: 2.5
  *     responses:
  *       201:
  *         description: Option créée avec succès
@@ -60,12 +70,6 @@ router.get('/', auth, getOptions);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Option'
- *       400:
- *         description: Données invalides
- *       401:
- *         description: Non autorisé
- *       500:
- *         description: Erreur serveur
  */
 router.post('/', auth, authorizeRoles('ADMINISTRATION'), createOption);
 

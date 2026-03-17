@@ -95,7 +95,6 @@ router.get('/:id',auth,  getUtilisateurDetails);
 /**
  * @swagger
  * /api/utilisateurs:
- *
  *   post:
  *     summary: Créer un nouvel utilisateur
  *     tags: [Utilisateurs]
@@ -106,20 +105,38 @@ router.get('/:id',auth,  getUtilisateurDetails);
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Utilisateur'
+ *             type: object
+ *             required:
+ *               - identifiant
+ *               - motDePasse
+ *               - role
+ *             properties:
+ *               identifiant:
+ *                 type: string
+ *                 example: admin@wacdo.fr
+ *               motDePasse:
+ *                 type: string
+ *                 example: Password123!
+ *               role:
+ *                 type: string
+ *                 example: ADMINISTRATION
  *     responses:
  *       201:
  *         description: Utilisateur créé avec succès
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Utilisateur'
- *       400:
- *         description: Données invalides
- *       401:
- *         description: Non autorisé
- *       500:
- *         description: Erreur serveur
+ *               type: object
+ *               properties:
+ *                 utilisateur_id:
+ *                   type: integer
+ *                   example: 1
+ *                 identifiant:
+ *                   type: string
+ *                   example: admin@wacdo.fr
+ *                 role:
+ *                   type: string
+ *                   example: ADMINISTRATION
  */
 router.post('/',auth,authorizeRoles('ADMINISTRATION'),createUtilisateur);
 
