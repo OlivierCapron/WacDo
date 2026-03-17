@@ -136,14 +136,12 @@ exports.deleteUtilisateur = async (req, res) => {
 };
 
 // WS  router.get('/roles',auth,  getRoles)
-exports.getRoles = async (req, res) => {
- try {
-    res.status(200).json(ROLES);
-  } catch (err) {
-    res.status(500).json({ error: "Erreur lors de la récupération des rôles / " + err });
-  }
-   
+exports.getRoles = (req, res) => { 
+  
+    res.status(200).json(["ADMINISTRATION", "PREPARATION", "ACCUEIL"]);
+  
 };
+
 
 // WS  router.post('/auth/login',loginUtilisateur);
 exports.loginUtilisateur = async (req, res) => {

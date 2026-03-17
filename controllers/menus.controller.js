@@ -174,7 +174,7 @@ exports.addProduitToMenu = async (req, res) => {
     const produit = await Produit.findByPk(produitId);
     if (!menu || !produit) return res.status(404).json({ message: 'Menu ou produit non trouvé' });
 
-    await menu.addProduit(produit);
+    await menu.addProduitToMenu(produit);
 
     return res.status(201).json({ message: 'Produit ajouté au menu avec succès' });
   } catch (err) {
@@ -195,7 +195,7 @@ exports.removeProduitFromMenu = async (req, res) => {
     const produit = await Produit.findByPk(produitId);
     if (!menu || !produit) return res.status(404).json({ message: 'Menu ou produit non trouvé' });
 
-    await menu.removeProduit(produit);
+    await menu.removeProduitFromMenu(produit);
 
     return res.status(200).json({ message: 'Produit retiré du menu avec succès' });
   } catch (err) {
@@ -218,10 +218,12 @@ exports.addOptionToMenu = async (req, res) => {
     const { optionId } = req.body;
 
     const menu = await Menu.findByPk(id);
-    const option = await Option.findByPk(optionId);
-    if (!menu || !option) return res.status(404).json({ message: 'Menu ou option non trouvé' });
+    if (!menu ) return res.status(404).json({ message: 'Menu non trouvé' });
 
-    await menu.addOption(option);
+    const option = await Option.findByPk(optionId);
+    if (!!option) return res.status(404).json({ message: 'Option non trouvé' });
+
+    await menu.addOptionToMenu(option);
 
     return res.status(201).json({ message: 'Option ajoutée au menu avec succès' });
   } catch (err) {
@@ -242,7 +244,7 @@ exports.removeOptionFromMenu = async (req, res) => {
     const option = await Option.findByPk(optionId);
     if (!menu || !option) return res.status(404).json({ message: 'Menu ou option non trouvé' });
 
-    await menu.removeOption(option);
+    await menu.removeOptionFromMenu(option);
 
     return res.status(200).json({ message: 'Option retirée du menu avec succès' });
   } catch (err) {
