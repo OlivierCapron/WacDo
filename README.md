@@ -114,7 +114,7 @@ npm run test:coverage
 ### Statuts de commande
 
 - `PUT /api/commandes/{id}/a-preparer` : Passer une commande à l’état `A_PREPARER`
-- `GET /api/commandes/a-preparer` : Liste des commandes à préparer
+- `GET /api/commandes/liste/status-a-preparer` : Liste des commandes à préparer
 - `PUT /api/commandes/{id}/preparee` : Marquer une commande comme préparée
 - `PUT /api/commandes/{id}/livree` : Marquer une commande comme livrée
 

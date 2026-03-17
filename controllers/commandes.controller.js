@@ -16,6 +16,10 @@ const Utilisateur = require('../models/utilisateur.model');
 
 
 
+
+
+
+
 /**
  * POST /api/commandes
  * 🔹 Créer une commande
@@ -30,9 +34,10 @@ exports.createCommande = async (req, res) => {
     if (!client) return res.status(404).json({ message: 'Client non trouvé' });
 
     const utilisateurAuth = req.utilisateur;
-    if (!utilisateurAuth || !utilisateurAuth.utilisateurId)
+    if (!utilisateurAuth || !utilisateurAuth.utilisateur_id)
+    {
       return res.status(401).json({ message: 'Utilisateur non authentifié (token invalide)' });
-
+    }
     const commande = await Commande.create({
       "client_id" : client_id,
       "tstamp_commande_cree" : new Date(), 
@@ -40,7 +45,7 @@ exports.createCommande = async (req, res) => {
       "origine" : origine,
       "prix_total" : 0.0,
       "prix_total_ttc" : 0.0,
-      "commande_createur_id" : utilisateurAuth.utilisateurId
+      "commande_createur_id" : utilisateurAuth.utilisateur_id
     });
 
     return res.status(201).json(commande);
@@ -220,7 +225,7 @@ exports.declarerCommandeAPreparer = async (req, res) => {
 };
 
 /**
- * GET /api/commandes/a-preparer
+ * GET /api/commandes/liste/status-a-preparer
  * Liste des commandes à préparer (VALIDÉES uniquement)
  */
 exports.getCommandesApreparer = async (req, res) => {
@@ -230,7 +235,6 @@ exports.getCommandesApreparer = async (req, res) => {
       include: [{ model: Client, as: 'client_de_la_commande' }],
       order: [['createdAt', 'ASC']]
     });
-
     return res.status(200).json(commandes);
   } catch (err) {
     console.error('Erreur lors de la récupération des commandes à préparer:', err);
@@ -245,6 +249,14 @@ exports.getCommandesApreparer = async (req, res) => {
  */
 exports.declarerCommandePreparee = async (req, res) => {
   try {
+
+    const utilisateurAuth = req.utilisateur;
+    if (!utilisateurAuth || !utilisateurAuth.utilisateur_id)
+    {
+      return res.status(401).json({ message: 'Utilisateur non authentifié (token invalide)' });
+    }
+
+
     const { id } = req.params;
     const commande = await Commande.findByPk(id);
     if (!commande) return res.status(404).json({ message: 'Commande non trouvée' });
@@ -252,7 +264,10 @@ exports.declarerCommandePreparee = async (req, res) => {
     if (commande.statut !== 'A_PREPARER')
       return res.status(400).json({ message: 'La commande doit être validée avant d’être préparée' });
 
-    await commande.update({ statut: 'PREPAREE' });
+    await commande.update({ statut: 'PREPAREE' ,
+          "commande_preparateur_id" : utilisateurAuth.utilisateur_id,
+        "tstamp_commande_preparee" : new Date() });
+
     return res.status(200).json({ message: 'Commande marquée comme préparée', commande });
   } catch (err) {
     console.error('Erreur lors de la préparation:', err);
@@ -266,6 +281,13 @@ exports.declarerCommandePreparee = async (req, res) => {
  */
 exports.declarerCommandeLivree = async (req, res) => {
   try {
+
+    const utilisateurAuth = req.utilisateur;
+    if (!utilisateurAuth || !utilisateurAuth.utilisateur_id)
+    {
+      return res.status(401).json({ message: 'Utilisateur non authentifié (token invalide)' });
+    }
+
     const { id } = req.params;
     const commande = await Commande.findByPk(id);
     if (!commande) return res.status(404).json({ message: 'Commande non trouvée' });
@@ -273,8 +295,12 @@ exports.declarerCommandeLivree = async (req, res) => {
     if (commande.statut !== 'PREPAREE')
       return res.status(400).json({ message: 'La commande doit être préparée avant d’être livrée' });
 
-    await commande.update({ statut: 'LIVREE' });
-    return res.status(200).json({ message: 'Commande livrée avec succès', commande });
+    await commande.update({ statut: 'LIVREE' ,
+          "commande_livreur_id" : utilisateurAuth.utilisateur_id,
+        "tstamp_commande_livree" : new Date() });
+
+
+          return res.status(200).json({ message: 'Commande livrée avec succès', commande });
   } catch (err) {
     console.error('Erreur lors de la livraison:', err);
     return res.status(500).json({ error: 'Erreur serveur: ' + err.message });

@@ -13,7 +13,7 @@ const MenuOption = sequelize.define('MenuOption', {
   menu_id: {
     type: DataTypes.BIGINT,
     allowNull: false,
-    references: { model: Menu, key: 'menu_id' }
+    references: { model: Menu, key: 'article_id' }
   },
   option_id: {
     type: DataTypes.BIGINT,

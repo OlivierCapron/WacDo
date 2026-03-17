@@ -110,7 +110,7 @@ router.get('/:id', auth,authorizeRoles( 'ACCUEIL','ADMINISTRATION'), getCommande
  *                 example: 1
  *               origine:
  *                 type: string
- *                 example: ['COMPTOIR', 'TELEPHONE']
+ *                 example: 'TELEPHONE'
  *     responses:
  *       201:
  *         description: Commande créée 
@@ -273,7 +273,7 @@ router.put('/:id/a-preparer', auth,authorizeRoles('ACCUEIL','ADMINISTRATION'), d
 
 /**
  * @swagger
- * /api/commandes/a-preparer:
+ * /api/commandes/liste/status-a-preparer:
  *   get:
  *     summary: Liste des commandes à préparer
  *     tags: [Statuts]
@@ -284,7 +284,7 @@ router.put('/:id/a-preparer', auth,authorizeRoles('ACCUEIL','ADMINISTRATION'), d
  *         description: Liste des commandes à préparer
  */
 
-  router.get('/liste/a-preparer', auth,authorizeRoles('PREPARATION','ADMINISTRATION'), getCommandesApreparer);
+  router.get('/liste/status-a-preparer', auth,authorizeRoles('PREPARATION','ADMINISTRATION'), getCommandesApreparer);
 
 /**
  * @swagger

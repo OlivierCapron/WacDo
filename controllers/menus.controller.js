@@ -1,11 +1,10 @@
-
 const Produit = require("../models/produit.model");
 const Menu = require("../models/menu.model");
 const Option = require("../models/option.model");
 const Categorie = require("../models/categorie.model");
 const Article = require("../models/article.model");
-
-
+const MenuOption = require("../models/menu_options.model");
+const MenuProduit = require("../models/menu_produits.model");
 
 /**
  * Récupérer la liste complète des menus
@@ -14,22 +13,21 @@ const Article = require("../models/article.model");
 exports.getMenus = async (req, res) => {
   try {
     const menus = await Menu.findAll({
-      include: [{ model: Article, as: 'article_menu' }]
+      include: [{ model: Article, as: "article_menu" }],
     });
 
-    const result = menus.map(menu => ({
+    const result = menus.map((menu) => ({
       menu_id: menu.article_id,
       nom: menu.article_menu?.nom,
       description: menu.article_menu?.description,
       disponible: menu.article_menu?.disponible,
       prix: menu.article_menu?.prix,
-     
     }));
 
     return res.status(200).json(result);
   } catch (err) {
-    console.error('Erreur lors de la récupération des menus:', err);
-    return res.status(500).json({ error: 'Erreur serveur: ' + err.message });
+    console.error("Erreur lors de la récupération des menus:", err);
+    return res.status(500).json({ error: "Erreur serveur: " + err.message });
   }
 };
 
@@ -41,29 +39,55 @@ exports.getMenuDetails = async (req, res) => {
   try {
     const { id } = req.params;
     const menu = await Menu.findByPk(id, {
-      include: [{ model: Article, as: 'article_menu' }]
+      include: [
+        {
+          model: Article,
+          as: "article_menu",
+        },
+        {
+          model: Produit,
+          as: "produits_du_menu",
+          through: { attributes: ["quantite"] },
+          include: [
+            {
+              model: Article,
+              as: "article_produit",
+            },
+          ],
+        },
+        {
+          model: Option,
+          as: "options_dun_menu",
+          through: { attributes: ["quantite"] },
+        },
+      ],
     });
 
-    if (!menu) return res.status(404).json({ message: 'Menu non trouvé' });
+    if (!menu) return res.status(404).json({ message: "Menu non trouvé" });
 
+    console.log(menu.options);
     const result = {
       menu_id: menu.article_id,
       nom: menu.article_menu.nom,
       description: menu.article_menu.description,
       prix: menu.article_menu.prix,
       disponible: menu.article_menu.disponible,
-      // produits: menu.produits.map(p => ({
-      //   produit_id: p.article_id,
-      //   nom: p.article_produit.nom,
-      //   prix: p.article_produit.prix
-      // })),
-      // options: menu.options
+      produits: (menu.produits_du_menu || []).map((p) => ({
+        produit_id: p.article_id,
+        nom: p.article_produit?.nom,
+        prix: p.article_produit?.prix,
+        quantite: p.MenuProduit?.quantite,
+      })),
+      options: (menu.options_dun_menu || []).map((o) => ({
+        option_id: o.option_id,
+        nom: o.nom,
+        quantite: o.MenuOption?.quantite,
+      })),
     };
-
     return res.status(200).json(result);
   } catch (err) {
-    console.error('Erreur lors de la récupération du menu:', err);
-    return res.status(500).json({ error: 'Erreur serveur: ' + err.message });
+    console.error("Erreur lors de la récupération du menu:", err);
+    return res.status(500).json({ error: "Erreur serveur: " + err.message });
   }
 };
 
@@ -80,10 +104,10 @@ exports.createMenu = async (req, res) => {
       description,
       prix,
       disponible,
-      type: 'MENU'
+      type: "MENU",
     });
 
-    const menu = await  Menu.create({
+    const menu = await Menu.create({
       article_id: article.article_id,
     });
 
@@ -95,8 +119,8 @@ exports.createMenu = async (req, res) => {
       disponible: article.disponible,
     });
   } catch (err) {
-    console.error('Erreur lors de la création du menu:', err);
-    return res.status(500).json({ error: 'Erreur serveur: ' + err.message });
+    console.error("Erreur lors de la création du menu:", err);
+    return res.status(500).json({ error: "Erreur serveur: " + err.message });
   }
 };
 
@@ -110,55 +134,53 @@ exports.editMenu = async (req, res) => {
     const { nom, description, prix, disponible } = req.body;
 
     const menu = await Menu.findByPk(id, {
-      include: [{ model: Article, as: 'article_menu' }]
+      include: [{ model: Article, as: "article_menu" }],
     });
-    if (!menu) return res.status(404).json({ message: 'Menu non trouvé' });
+    if (!menu) return res.status(404).json({ message: "Menu non trouvé" });
 
     await menu.article_menu.update({
       nom: nom ?? menu.article_menu.nom,
       description: description ?? menu.article_menu.description,
       prix: prix ?? menu.article_menu.prix,
-      disponible: disponible ?? menu.article_menu.disponible
+      disponible: disponible ?? menu.article_menu.disponible,
     });
 
     return res.status(200).json({
-      message: 'Menu mis à jour avec succès',
+      message: "Menu mis à jour avec succès",
       menu: {
         menu_id: menu.article_id,
         nom: menu.article_menu.nom,
         description: menu.article_menu.description,
         prix: menu.article_menu.prix,
-        disponible: menu.article_menu.disponible
-      }
+        disponible: menu.article_menu.disponible,
+      },
     });
   } catch (err) {
-      console.error('Erreur lors de la mise à jour du menu:', err);
-    return res.status(500).json({ error: 'Erreur serveur: ' + err.message });
+    console.error("Erreur lors de la mise à jour du menu:", err);
+    return res.status(500).json({ error: "Erreur serveur: " + err.message });
   }
 };
 
 ///
 /* DELETE /api/menus/:id
- * Supprimer 
- * 
- * 
+ * Supprimer
+ *
+ *
  */
 exports.deleteMenu = async (req, res) => {
   try {
     const { id } = req.params;
     const menu = await Menu.findByPk(id);
-    if (!menu) return  res.status(404).json({ message: 'Menu non trouvé' });
+    if (!menu) return res.status(404).json({ message: "Menu non trouvé" });
 
     await menu.destroy();
 
-
-    return res.status(200).json({   message: 'Menu supprimé avec succès' });
+    return res.status(200).json({ message: "Menu supprimé avec succès" });
   } catch (err) {
-    console.error('Erreur lors de la suppression du menu:', err);
-    return res.status(500).json({ error: 'Erreur serveur: ' + err.message });
+    console.error("Erreur lors de la suppression du menu:", err);
+    return res.status(500).json({ error: "Erreur serveur: " + err.message });
   }
 };
-
 
 /**
  * GESTION DES Produits dans le menu
@@ -168,18 +190,32 @@ exports.deleteMenu = async (req, res) => {
 exports.addProduitToMenu = async (req, res) => {
   try {
     const { id } = req.params;
-    const { produitId } = req.body;
+    const { produitId, quantite } = req.body;
 
-    const menu = await Menu.findByPk(id);
+    const menu = await Menu.findOne({ where: { article_id: id } });
+    if (!menu)
+      return res
+        .status(404)
+        .json({ message: "Menu  non trouvé avec id " + id });
+
     const produit = await Produit.findByPk(produitId);
-    if (!menu || !produit) return res.status(404).json({ message: 'Menu ou produit non trouvé' });
+    if (!produit)
+      return res
+        .status(404)
+        .json({ message: "Produit non trouvé avec id " + produitId });
 
-    await menu.addProduitToMenu(produit);
+    await MenuProduit.create({
+      menu_id: menu.article_id,
+      produit_id: produitId,
+      quantite,
+    });
 
-    return res.status(201).json({ message: 'Produit ajouté au menu avec succès' });
+    return res
+      .status(201)
+      .json({ message: "Produit ajouté au menu avec succès" });
   } catch (err) {
-    console.error('Erreur lors de l’ajout du produit au menu:', err);
-    return res.status(500).json({ error: 'Erreur serveur: ' + err.message });
+    console.error("Erreur lors de l’ajout du produit au menu:", err);
+    return res.status(500).json({ error: "Erreur serveur: " + err.message });
   }
 };
 
@@ -193,14 +229,28 @@ exports.removeProduitFromMenu = async (req, res) => {
 
     const menu = await Menu.findByPk(id);
     const produit = await Produit.findByPk(produitId);
-    if (!menu || !produit) return res.status(404).json({ message: 'Menu ou produit non trouvé' });
+    if (!menu || !produit)
+      return res.status(404).json({ message: "Menu ou produit non trouvé" });
 
-    await menu.removeProduitFromMenu(produit);
+    const deletedCount = await MenuProduit.destroy({
+      where: {
+        menu_id: menu.article_id,
+        produit_id: produitId,
+      },
+    });
 
-    return res.status(200).json({ message: 'Produit retiré du menu avec succès' });
+    if (deletedCount === 0) {
+      return res.status(404).json({
+        message: "Cette option n'est pas liée à ce menu",
+      });
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Produit retiré du menu avec succès" });
   } catch (err) {
-    console.error('Erreur lors du retrait du produit du menu:', err);
-    return res.status(500).json({ error: 'Erreur serveur: ' + err.message });
+    console.error("Erreur lors du retrait du produit du menu:", err);
+    return res.status(500).json({ error: "Erreur serveur: " + err.message });
   }
 };
 
@@ -215,20 +265,39 @@ exports.removeProduitFromMenu = async (req, res) => {
 exports.addOptionToMenu = async (req, res) => {
   try {
     const { id } = req.params;
-    const { optionId } = req.body;
+    const optionId = req.body.optionId ?? req.body.option_id;
+    const quantite = req.body.quantite;
+
+    if (!optionId) {
+      return res.status(400).json({ message: "optionId manquant" });
+    }
+
+    if (quantite == null) {
+      return res.status(400).json({ message: "quantite manquante" });
+    }
 
     const menu = await Menu.findByPk(id);
-    if (!menu ) return res.status(404).json({ message: 'Menu non trouvé' });
+    if (!menu) {
+      return res.status(404).json({ message: "Menu non trouvé" });
+    }
 
     const option = await Option.findByPk(optionId);
-    if (!!option) return res.status(404).json({ message: 'Option non trouvé' });
+    if (!option) {
+      return res.status(404).json({ message: "Option non trouvée" });
+    }
 
-    await menu.addOptionToMenu(option);
+    await MenuOption.create({
+      menu_id: menu.article_id,
+      option_id: option.option_id,
+      quantite,
+    });
 
-    return res.status(201).json({ message: 'Option ajoutée au menu avec succès' });
+    return res.status(201).json({
+      message: "Option ajoutée au menu avec succès",
+    });
   } catch (err) {
-    console.error('Erreur lors de l’ajout d’une option au menu:', err);
-    return res.status(500).json({ error: 'Erreur serveur: ' + err.message });
+    console.error("Erreur lors de l’ajout d’une option au menu:", err);
+    return res.status(500).json({ error: "Erreur serveur: " + err.message });
   }
 };
 
@@ -236,19 +305,39 @@ exports.addOptionToMenu = async (req, res) => {
  * DELETE /api/menus/:id/options/:optionId
  * Retirer une option d’un menu
  */
+
 exports.removeOptionFromMenu = async (req, res) => {
   try {
     const { id, optionId } = req.params;
 
     const menu = await Menu.findByPk(id);
+    if (!menu) {
+      return res.status(404).json({ message: "Menu non trouvé" });
+    }
+
     const option = await Option.findByPk(optionId);
-    if (!menu || !option) return res.status(404).json({ message: 'Menu ou option non trouvé' });
+    if (!option) {
+      return res.status(404).json({ message: "Option non trouvée" });
+    }
 
-    await menu.removeOptionFromMenu(option);
+    const deletedCount = await MenuOption.destroy({
+      where: {
+        menu_id: menu.article_id,
+        option_id: option.option_id,
+      },
+    });
 
-    return res.status(200).json({ message: 'Option retirée du menu avec succès' });
+    if (deletedCount === 0) {
+      return res.status(404).json({
+        message: "Cette option n'est pas liée à ce menu",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Option retirée du menu avec succès",
+    });
   } catch (err) {
-    console.error('Erreur lors du retrait de l’option du menu:', err);
-    return res.status(500).json({ error: 'Erreur serveur: ' + err.message });
+    console.error("Erreur lors du retrait de l’option du menu:", err);
+    return res.status(500).json({ error: "Erreur serveur: " + err.message });
   }
 };

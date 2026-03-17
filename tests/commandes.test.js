@@ -71,19 +71,19 @@ describe('Tests API /api/commandes', () => {
       {
         utilisateur_id: 1,
         identifiant: 'admin@wacdo.fr',
-        motDePasse: 'Password123',
+        motDePasse: 'Password123!',
         role: 'ADMINISTRATION'
       }, {
         utilisateur_id: 2,
         identifiant: 'accueil@wacdo.fr',
-        motDePasse: 'Password123',
+        motDePasse: 'Password123!',
         role: 'ACCUEIL'
       },
 
       {
         utilisateur_id: 3,
         identifiant: 'preparation@wacdo.fr',
-        motDePasse: 'Password123',
+        motDePasse: 'Password123!',
         role: 'PREPARATION'
       }
     ]);
@@ -184,6 +184,7 @@ describe('Tests API /api/commandes', () => {
     const res = await request(app)
       .get('/api/commandes')
       .set('Authorization', `Bearer ${accueilToken}`);
+    console.log("AAAA"+res.body)
 
     expect(res.statusCode).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
@@ -248,7 +249,7 @@ describe('Tests API /api/commandes', () => {
   });
 
   /**
-   * Valider une commande
+   * Valider une commande 
    */
   test('PUT /api/commandes/:id/declarerCommandeAPreparer : Valider commande', async () => {
     const res = await request(app)
@@ -262,16 +263,16 @@ describe('Tests API /api/commandes', () => {
   /**
    *Liste des commandes à préparer
    */
-  test('GET /api/commandes/liste/a-preparer : Commandes au status A_PREAPRER', async () => {
+  test('GET /api/commandes/liste/status-a-preparer : Commandes au status A_PREAPRER', async () => {
     const res = await request(app)
-      .get('/api/commandes/liste/a-preparer')
+      .get('/api/commandes/liste/status-a-preparer')
       .set('Authorization', `Bearer ${accueilToken}`);
 
     // 403 car c'est un role PREPARATION qu'il faut
     expect(res.statusCode).toBe(403);
 
     const res2 = await request(app)
-      .get('/api/commandes/liste/a-preparer')
+      .get('/api/commandes/liste/status-a-preparer')
       .set('Authorization', `Bearer ${preparationToken}`);
 
     // 200 car c'est un role PREPARATION qu'il faut
